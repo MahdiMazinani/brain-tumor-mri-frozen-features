@@ -1,0 +1,22 @@
+test_alignment (test_v21.CoreTests.test_alignment) ... ok
+test_cache_exact_token (test_v21.CoreTests.test_cache_exact_token) ... ok
+test_duplicate (test_v21.CoreTests.test_duplicate) ... ok
+test_exact_mcnemar (test_v21.CoreTests.test_exact_mcnemar) ... ok
+test_hand_metrics (test_v21.CoreTests.test_hand_metrics) ... ok
+test_lock (test_v21.CoreTests.test_lock) ... ok
+test_manifest_guard (test_v21.CoreTests.test_manifest_guard) ... ok
+test_mean_pooling (test_v21.CoreTests.test_mean_pooling) ... ok
+test_no_discordance (test_v21.CoreTests.test_no_discordance) ... ok
+test_patient_conflicting_label (test_v21.CoreTests.test_patient_conflicting_label) ... ok
+test_patient_crossfold (test_v21.CoreTests.test_patient_crossfold) ... ok
+test_perfect_metrics (test_v21.CoreTests.test_perfect_metrics) ... ok
+test_probability_validation (test_v21.CoreTests.test_probability_validation) ... ok
+test_stats_outputs (test_v21.CoreTests.test_stats_outputs) ... ok
+test_full_lifecycle (test_v21.LPIntegration.test_full_lifecycle) ... skipped 'scikit-learn absent: run this integration test in venv311'
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.094s
+
+OK (skipped=1)
+COMPLETE: /tmp/tmp_1sc60ic/out | 6 IDs, 12 slices, 2 methods; mean probabilities: True
+COMPLETE: /tmp/tmphy5f_w1p/out | 6 IDs, 12 slices, 2 methods; mean probabilities: False
