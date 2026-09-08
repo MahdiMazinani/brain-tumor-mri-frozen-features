@@ -59,45 +59,55 @@ def run(a):
     ref=df[df.method==methods[0]].sort_values('path')
     truth=ref.y_true.to_numpy(); gi=ref.patient_id.map(idmap).to_numpy()
     idtruth=ref.groupby('patient_id').y_true.first().reindex(ids).to_numpy()
+    # Fixed class-stratified bootstrap of released IDs. All methods share draws.
     rng=np.random.default_rng(a.seed); weights=np.zeros((a.resamples,len(ids)),dtype=int)
     for c in range(k):
         ix=np.where(idtruth==c)[0]
         weights[:,ix]=rng.multinomial(len(ix),np.full(len(ix),1/len(ix)),size=a.resamples)
-    pcols=['p_'+str(c) for c in range(k)];pools=['majority_vote']
+    pcols=['p_'+str(c) for c in range(k)]
+    pools=['majority_vote']
     if any(c.startswith('p_') for c in df.columns):
         if not set(pcols).issubset(df):raise ValueError('Incomplete probability columns')
         pp=df[pcols].to_numpy(float)
         if not np.isfinite(pp).all() or (pp<0).any() or not np.allclose(pp.sum(1),1,atol=1e-5):raise ValueError('Invalid probabilities')
         if not np.allclose(pp[np.arange(len(df)),df.y_pred],pp.max(1),atol=1e-6):raise ValueError('Stored labels disagree with probability argmax')
         pools.append('mean_probability')
-    modes=['slice_clustered']+pools;cubes={};boot={};preds={};summaries=[];patientrows=[];foldrows=[]
+    modes=['slice_clustered']+pools; cubes={}; boot={}; preds={}; summaries=[]; patientrows=[]; foldrows=[]
     for m in methods:
-        r=df[df.method==m].sort_values('path');pred=r.y_pred.to_numpy();preds[m]=pred
-        cube=np.zeros((len(ids),k,k),dtype=int);np.add.at(cube,(gi,truth,pred),1);cubes[(m,'slice_clustered')]=cube
+        r=df[df.method==m].sort_values('path'); pred=r.y_pred.to_numpy();preds[m]=pred
+        cube=np.zeros((len(ids),k,k),dtype=int)
+        np.add.at(cube,(gi,truth,pred),1);cubes[(m,'slice_clustered')]=cube
         for pool in pools:
-            scores=cube.sum(axis=1) if pool=='majority_vote' else r.groupby('patient_id')[pcols].mean().reindex(ids).to_numpy()
+            if pool=='majority_vote':
+                scores=cube.sum(axis=1)
+            else:
+                scores=r.groupby('patient_id')[pcols].mean().reindex(ids).to_numpy()
             winners=scores.argmax(axis=1);ties=np.sum(np.isclose(scores,scores.max(1,keepdims=True),atol=1e-12,rtol=0),axis=1)>1
             pc=np.zeros_like(cube);pc[np.arange(len(ids)),idtruth,winners]=1;cubes[(m,pool)]=pc
             for i,pid in enumerate(ids):patientrows.append(dict(method=m,pooling=pool,patient_id=pid,fold=int(ref[ref.patient_id==pid].fold.iloc[0]),y_true=int(idtruth[i]),y_pred=int(winners[i]),slices=int(cube[i].sum()),tie=bool(ties[i])))
         for mode in modes:
-            cc=cubes[(m,mode)];point=metrics(cc.sum(0));bs=metrics((weights@cc.reshape(len(ids),-1)).reshape(a.resamples,k,k));boot[(m,mode)]=bs
+            cc=cubes[(m,mode)]; point=metrics(cc.sum(0));bs=metrics((weights@cc.reshape(len(ids),-1)).reshape(a.resamples,k,k));boot[(m,mode)]=bs
             for j,metric in enumerate(METRICS):
                 lo,hi=np.quantile(bs[:,j],[.025,.975]);summaries.append(dict(method=m,unit=mode,metric=metric,estimate=float(point[j]),ci95_low=float(lo),ci95_high=float(hi),identifiers=len(ids),slices=len(ref)))
         for f in sorted(ref.fold.unique()):
-            mask=ref.fold.to_numpy()==f;cm=np.zeros((k,k),int);np.add.at(cm,(truth[mask],pred[mask]),1);foldrows.append(dict(method=m,fold=int(f),**dict(zip(METRICS,metrics(cm)))))
+            mask=ref.fold.to_numpy()==f;cm=np.zeros((k,k),int);np.add.at(cm,(truth[mask],pred[mask]),1)
+            foldrows.append(dict(method=m,fold=int(f),**dict(zip(METRICS,metrics(cm)))))
     comparisons=[]
     for mode in modes:
-        delta=boot[(a.a,mode)]-boot[(a.b,mode)];observed=metrics(cubes[(a.a,mode)].sum(0))-metrics(cubes[(a.b,mode)].sum(0))
+        delta=boot[(a.a,mode)]-boot[(a.b,mode)]
+        observed=metrics(cubes[(a.a,mode)].sum(0))-metrics(cubes[(a.b,mode)].sum(0))
         for j,metric in enumerate(METRICS):
             lo,hi=np.quantile(delta[:,j],[.025,.975]);comparisons.append(dict(comparison=a.a+' minus '+a.b,unit=mode,metric=metric,difference=float(observed[j]),ci95_low=float(lo),ci95_high=float(hi)))
     tests=[dict(unit='slice_IID_DIAGNOSTIC_ONLY',**exact_mcnemar(truth,preds[a.a],preds[a.b]))]
     for pool in pools:
-        pa=cubes[(a.a,pool)].sum(1).argmax(1);pb=cubes[(a.b,pool)].sum(1).argmax(1);tests.append(dict(unit='identifier_'+pool,**exact_mcnemar(idtruth,pa,pb)))
-    for name,rows_ in [('metric_intervals',summaries),('paired_differences',comparisons),('mcnemar',tests),('patient_predictions',patientrows),('fold_metrics',foldrows)]:pd.DataFrame(rows_).to_csv(out/(name+'.csv'),index=False)
+        pa=cubes[(a.a,pool)].sum(1).argmax(1);pb=cubes[(a.b,pool)].sum(1).argmax(1)
+        tests.append(dict(unit='identifier_'+pool,**exact_mcnemar(idtruth,pa,pb)))
+    for name,rows in [('metric_intervals',summaries),('paired_differences',comparisons),('mcnemar',tests),('patient_predictions',patientrows),('fold_metrics',foldrows)]:pd.DataFrame(rows).to_csv(out/(name+'.csv'),index=False)
     pd.DataFrame(foldrows).groupby('method')[METRICS].agg(['mean','std']).to_csv(out/'fold_mean_sd.csv')
-    info=dict(methods=methods,slices=len(ref),identifiers=len(ids),resamples=a.resamples,seed=a.seed,classes=k,comparison=[a.a,a.b],input_sha256=hashlib.sha256(Path(a.oof).read_bytes()).hexdigest(),mean_probability_available='mean_probability' in pools,interpretation=['POST-HOC exploratory analysis; no new independent cohort.','Values are fractions, not percentages. CI for pooled metrics is NOT CI for fold mean.','Bootstrap: class-stratified released-ID clusters; pointwise percentile 95% intervals. Pairwise draws shared across methods.','Slice McNemar violates within-ID independence: diagnostic only, not evidence of patient-level significance.','Identifier aggregation uses deterministic lowest-class-index tie break, with ties explicitly counted. Do not select the best pooling rule after viewing results.','Patient means released identifier, not verified distinct natural person. Outer models share training cases: these intervals condition on fitted OOF predictions and omit retraining/selection variability.','Single focal pair only; no unadjusted all-pairs testing. Do not infer superiority across all metrics from one p-value.'])
+    info=dict(methods=methods,slices=len(ref),identifiers=len(ids),resamples=a.resamples,seed=a.seed,classes=k,comparison=[a.a,a.b],input_sha256=hashlib.sha256(Path(a.oof).read_bytes()).hexdigest(),mean_probability_available='mean_probability' in pools,
+      interpretation=['POST-HOC exploratory analysis; no new independent cohort.', 'Values are fractions, not percentages. CI for pooled metrics is NOT CI for fold mean.', 'Bootstrap: class-stratified released-ID clusters; pointwise percentile 95% intervals. Pairwise draws shared across methods.', 'Slice McNemar violates within-ID independence: diagnostic only, not evidence of patient-level significance.', 'Identifier aggregation uses deterministic lowest-class-index tie break, with ties explicitly counted. Do not select the best pooling rule after viewing results.', 'Patient means released identifier, not verified distinct natural person. Outer models share training cases: these intervals condition on fitted OOF predictions and omit retraining/selection variability.', 'Single focal pair only; no unadjusted all-pairs testing. Do not infer superiority across all metrics from one p-value.'])
     (out/'analysis.json').write_text(json.dumps(info,indent=2),encoding='utf-8')
-    print('COMPLETE:',out,'|',len(ids),'IDs,',len(ref),'slices,',len(methods),'methods; mean probabilities:',info['mean_probability_available'])
+    print('COMPLETE:',out, '|',len(ids),'IDs,',len(ref),'slices,',len(methods),'methods; mean probabilities:',info['mean_probability_available'])
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--oof',required=True);p.add_argument('--out',required=True);p.add_argument('--a',default='proposed');p.add_argument('--b',default='linear_probe');p.add_argument('--resamples',type=int,default=2000);p.add_argument('--seed',type=int,default=42);run(p.parse_args())
