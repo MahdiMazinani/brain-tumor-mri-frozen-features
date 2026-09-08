@@ -1,0 +1,3 @@
+# Data and code availability statement
+
+The datasets used in this study are available from their original providers and are not redistributed in this repository. The code, experiment configurations, de-identified prediction-level outputs and aggregate results supporting the reported analyses are available in this repository. The exact fold manifests contain source paths and released identifier strings and remain withheld pending confirmation of data-use and sharing permissions. An archival DOI should be added after creating a GitHub release and archiving the release (for example, through Zenodo).

@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+title: Frozen Deep Features for Brain Tumor MRI Classification
+message: "If you use this software, please cite the associated manuscript."
+type: software
+authors:
+  - family-names: Mazinani
+    given-names: Mahdi
+  - family-names: Rahbar
+    given-names: Kambiz
+version: 0.1.0
+date-released: 2026-09-08
+license: MIT

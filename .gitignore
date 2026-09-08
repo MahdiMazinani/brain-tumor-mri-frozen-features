@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv*/
+native_cache/
+*.npy
+*.pt
+*.joblib
+*.log
+ACTIVE.lock
+FINAL_STARTED.json
+# Do not add raw MRI, MATLAB source files, private manifests, local paths, or ID mapping files.
