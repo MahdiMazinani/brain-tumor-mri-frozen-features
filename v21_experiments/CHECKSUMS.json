@@ -1,0 +1,22 @@
+{
+  "OOF_ANALYSIS.py": "8579c4526e7301316a175fd0b22ee8f4991eed29f6033117b01106f7a442ac25",
+  "EXPERIMENT_COMMON.py": "f4ce4f2a194432528a0245d9ad31bf5dd8cf5a38ac8ba7057cb31f64722aad86",
+  "NEW_CONTROLS.py": "9655c538ce1226677acc24b9bb0dd95da3f0052246a5c59b74d3adc670e36b86",
+  "VISION_HELPERS.py": "08a21a1edc8815fab222d44dfe5d47a41b722756f0aca6d0753e9297b92a43f4",
+  "BENCHMARK_TIMING.py": "1e529d1c12155ee8a4227516afe9111caaa2a22fc20268402e4daef76eea0210",
+  "test_v21.py": "01da57db659e1596c1327ba1dc8d4a1fb66f97d240b3a05cb59bc548d5d90acc",
+  "QA_RESULTS.txt": "b04b0179c10e45aa6daac4d9dd19d2598c7dd91228791750387d02931e599937",
+  "MERGE_OOF.py": "fdd0d546a8cc2a9f7b3854c68d2120690701b4bb0ab644db5ae7ce6d4251e0f8",
+  "README_FA.md": "bc1154d747041534812197d4843ce01a2fcc1380e2962f81952a73cbae8e99c2",
+  "TIME_ALL_FOLDS.bat": "ea157a4e1e9b45ce06275c7081d52388bb801824f866b67b3ee096c1f37b120f",
+  "existing_oof_analysis/metric_intervals.csv": "b159e7a1fe5e65e111bc0edbff46a36353df20a96d3bae383584b45381023547",
+  "existing_oof_analysis/paired_differences.csv": "af1fe44a2df233f886bfb58f51ba4895f8176a21441411dbe14c86158dff3290",
+  "existing_oof_analysis/mcnemar.csv": "d02569f251b775a362a146fb13e8c4c103af0add48d8e2bc64cdf3fa8308416b",
+  "existing_oof_analysis/patient_predictions.csv": "38527108a69dc240c85281b9221497d21cc9dbd77ccedd11eda547d2fbd418fd",
+  "existing_oof_analysis/fold_metrics.csv": "2c4b23fe4a7187b9173181bf3ef49cf9aa2990359ca8d06eea027d41fb34dc32",
+  "existing_oof_analysis/fold_mean_sd.csv": "d96368c5f2ebd816c45394193d179a6e798b1dd9d2aeafb8d52aff35914eecfc",
+  "existing_oof_analysis/analysis.json": "5be8f941022cfd7e8d66ba24aafc02fc0ef19406ab27cb8f440da45bd8a2988a",
+  "existing_oof_analysis/patient_accuracy_summary.csv": "9c9d4e2f926840096caef220024a6103a983dc3943ca7f003b97ecdcd627876e",
+  "existing_timing_audit/historical_recorded_fit_fields.csv": "487d8f6ed1849d8d5e113d9100b2d393bc519decf85210e6cc14ff6dc57f8f8c",
+  "existing_timing_audit/timing_audit.json": "53a0c1e0fb44bffc51aff9e0b7a6508bae250f63ece3395723a227aa41934923"
+}
