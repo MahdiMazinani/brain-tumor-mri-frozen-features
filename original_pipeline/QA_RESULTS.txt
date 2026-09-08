@@ -1,0 +1,20 @@
+test_content_mutation_detected (__main__.DataTests.test_content_mutation_detected) ... ok
+test_cross_split_group_rejected (__main__.DataTests.test_cross_split_group_rejected) ... ok
+test_csv_groups (__main__.DataTests.test_csv_groups) ... ok
+test_development_guard (__main__.DataTests.test_development_guard) ... ok
+test_flat (__main__.DataTests.test_flat) ... ok
+test_high_bit_depth_rejected (__main__.DataTests.test_high_bit_depth_rejected) ... ok
+test_holm (__main__.DataTests.test_holm) ... ok
+test_identical_content_not_removed (__main__.DataTests.test_identical_content_not_removed) ... ok
+test_keep_valid_when_test_missing (__main__.DataTests.test_keep_valid_when_test_missing) ... ok
+test_missing_class_rejected (__main__.DataTests.test_missing_class_rejected) ... ok
+test_paired (__main__.DataTests.test_paired) ... ok
+test_preserve_all_splits (__main__.DataTests.test_preserve_all_splits) ... ok
+test_seed_reproducible (__main__.DataTests.test_seed_reproducible) ... ok
+test_train_test_carve_valid_only (__main__.DataTests.test_train_test_carve_valid_only) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.272s
+
+OK
+PASS: original v5 Bed5/config compatibility, dynamic counts/classes, native test guard, no old corpus measurements.
